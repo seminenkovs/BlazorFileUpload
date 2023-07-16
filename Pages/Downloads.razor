@@ -1,0 +1,43 @@
+﻿@page "/downloads"
+@using BlazorFileUpload.Services;
+@inject IFIleDownload fileDownload;
+
+@if (previewImages.Count > 0)
+{
+    <div class="card">
+        <div class="row align-items-start">
+            @foreach(var item in previewImages)
+            {
+                var type = item.Split(";");
+                <div class="col-2">
+                    @if (type[0].Contains("image"))
+                    {
+                        <img class="rounded float-left" src="@item" width="100" height="100" />
+                    }
+                    else
+                    {
+                        if(type[0].Contains("pdf"))
+                        {
+                            <img class="rounded float-left" src="images/pdf_logo.png" width="100" height="100" />
+                        }
+                    }
+                    <button @onclick="() => DownloadFile(item)">Download</button>
+                </div>
+            }
+        </div>
+    </div>    
+}
+
+@code {
+    private IList<string> previewImages = new List<string>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        previewImages = await fileDownload.GetUploadedFiles();
+    }
+
+    private async void DownloadFile(string url)
+    {
+        await fileDownload.DownloadFile(url);
+    }
+}
